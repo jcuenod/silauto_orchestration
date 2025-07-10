@@ -11,6 +11,7 @@ services:
       - CUDA_DEVICE=0
       - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
       - USERNAME=${USER}
+      - CLIENT_PATH=/app/client
     volumes:
       - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
     extra_hosts:
