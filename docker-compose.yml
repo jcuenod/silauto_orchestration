@@ -1,21 +1,20 @@
-version: '3.8'
-
 services:
   silauto-worker-1:
     build: worker
     restart: unless-stopped
     environment:
-      - SILAUTO_URL=http://localhost:8000
+      - SILAUTO_URL=http://silauto-api:8000
       - SILNLP_ROOT=${HOME}/silnlp
       - SILNLP_DATA=${HOME}/silnlp_data
       - CUDA_DEVICE=0
       - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
       - USERNAME=${USER}
-      - CLIENT_PATH=/app/client
     volumes:
       - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - silauto-net
     deploy:
       resources:
         reservations:
@@ -34,14 +33,18 @@ services:
     restart: unless-stopped
     environment:
       - SILAUTO_URL=http://localhost:8000
-      - SILNLP_ROOT=${HOME}/silnlp
-      - SILNLP_DATA=${HOME}/silnlp_data
+      - SILNLP_ROOT=/silnlp
+      - SILNLP_DATA=/silnlp_data
       - CUDA_DEVICE=1
       - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
     volumes:
       - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
+      - ${HOME}/silnlp:/silnlp
+      - ${HOME}/silnlp_data:/silnlp_data
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - silauto-net
     deploy:
       resources:
         reservations:
@@ -59,11 +62,18 @@ services:
     build: server
     restart: unless-stopped
     environment:
-    - SILNLP_DATA=${HOME}/silnlp_data
+    - SILNLP_DATA=/silnlp_data
     - MAX_CONCURRENT_FILE_PROCESSING=10
     - DATABASE_PATH=/app/db
+    - CLIENT_PATH=/app/client
     volumes:
     - ${HOME}/silnlp_data:/silnlp_data
     - ${HOME}/.silauto/db:/app/db
     ports:
     - "8000:8000"
+    networks:
+      - silauto-net
+
+networks:
+  silauto-net:
+    driver: bridge
