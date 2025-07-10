@@ -1,0 +1,6 @@
+[submodule "worker"]
+	path = worker
+	url = git@github.com:jcuenod/silauto_worker.git
+[submodule "server"]
+	path = server
+	url = git@github.com:jcuenod/silauto_server.git

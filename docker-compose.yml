@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  silauto-worker-1:
+    build: worker
+    restart: unless-stopped
+    environment:
+      - SILAUTO_URL=http://localhost:8000
+      - SILNLP_ROOT=${HOME}/silnlp
+      - SILNLP_DATA=${HOME}/silnlp_data
+      - CUDA_DEVICE=0
+      - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
+      - USERNAME=${USER}
+    volumes:
+      - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  silauto-worker-2:
+    build: worker
+    restart: unless-stopped
+    environment:
+      - SILAUTO_URL=http://localhost:8000
+      - SILNLP_ROOT=${HOME}/silnlp
+      - SILNLP_DATA=${HOME}/silnlp_data
+      - CUDA_DEVICE=1
+      - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
+    volumes:
+      - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  silauto-api:
+    build: server
+    restart: unless-stopped
+    environment:
+    - SILNLP_DATA=${HOME}/silnlp_data
+    - MAX_CONCURRENT_FILE_PROCESSING=10
+    - DATABASE_PATH=/app/db
+    volumes:
+    - ${HOME}/silnlp_data:/silnlp_data
+    - ${HOME}/.silauto/db:/app/db
+    ports:
+    - "8000:8000"
