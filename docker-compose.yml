@@ -6,9 +6,9 @@ services:
       - SILAUTO_URL=http://silauto-api:8000
       - SILNLP_ROOT=${HOME}/silnlp
       - SILNLP_DATA=${HOME}/silnlp_data
-      - CUDA_DEVICE=0
       - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
       - USERNAME=${USER}
+      - CUDA_DEVICE=0
     volumes:
       - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
     extra_hosts:
@@ -32,15 +32,14 @@ services:
     build: worker
     restart: unless-stopped
     environment:
-      - SILAUTO_URL=http://localhost:8000
-      - SILNLP_ROOT=/silnlp
-      - SILNLP_DATA=/silnlp_data
-      - CUDA_DEVICE=1
+      - SILAUTO_URL=http://silauto-api:8000
+      - SILNLP_ROOT=${HOME}/silnlp
+      - SILNLP_DATA=${HOME}/silnlp_data
       - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
+      - USERNAME=${USER}
+      - CUDA_DEVICE=1
     volumes:
       - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
-      - ${HOME}/silnlp:/silnlp
-      - ${HOME}/silnlp_data:/silnlp_data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
