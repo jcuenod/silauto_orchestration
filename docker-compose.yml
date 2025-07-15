@@ -1,3 +1,11 @@
+# USAGE NOTES:
+#
+# 1. If you use start.sh, it will create a db at ~/.silauto/db
+# Otherwise, you will need to modify the mount for `silauto-api`
+#
+# 2. If you have multiple GPUs, you should duplicate teh silauto-worker
+# but modify the CUDA_DEVICE so that there is 1 worker per device.
+
 services:
   silauto-worker-1:
     build: worker
@@ -6,11 +14,11 @@ services:
       - SILAUTO_URL=http://silauto-api:8000
       - SILNLP_ROOT=${HOME}/silnlp
       - SILNLP_DATA=${HOME}/silnlp_data
-      - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
+      - USFM2PDF_PATH=${USFM2PDF_PATH}
       - USERNAME=${USER}
       - CUDA_DEVICE=0
     volumes:
-      - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
+      - ${SSH_CONTAINER_KEY}:/app/.ssh/id_ed25519:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -61,16 +69,16 @@ services:
     build: 
       context: server
       args:
-      - UID: ${UID:-$(id -u)}
-      - GID: ${GID:-$(id -g)}
+      - UID: ${UID}
+      - GID: ${GID}
     restart: unless-stopped
     environment:
-    - SILNLP_DATA=/silnlp_data
+    - SILNLP_DATA=${SILNLP_DATA}
     - MAX_CONCURRENT_FILE_PROCESSING=10
     - DATABASE_PATH=/app/db
     - CLIENT_PATH=/app/client
     volumes:
-    - ${HOME}/silnlp_data:/silnlp_data
+    - ${SILNLP_DATA}:${SILNLP_DATA}
     - ${HOME}/.silauto/db:/app/db
     ports:
     - "8000:8000"
