@@ -58,7 +58,11 @@ services:
         max-file: "3"
 
   silauto-api:
-    build: server
+    build: 
+      context: server
+      args:
+      - UID: ${UID:-$(id -u)}
+      - GID: ${GID:-$(id -g)}
     restart: unless-stopped
     environment:
     - SILNLP_DATA=/silnlp_data
