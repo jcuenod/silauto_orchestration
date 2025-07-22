@@ -1,5 +1,8 @@
 export UID=$(id -u)
 export GID=$(id -g)
+export SILNLP_ROOT=$HOME/silnlp
+export SILNLP_DATA=$HOME/silnlp_data
+
 mkdir -p ${HOME}/.silauto/db
 
 if [ -f .env ]; then

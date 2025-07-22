@@ -8,12 +8,18 @@
 
 services:
   silauto-worker-1:
-    build: worker
+    build:
+      context: worker
+      args:
+      - UID=${UID}
+      - GID=${GID}
+      - USERNAME=${USER}
     restart: unless-stopped
+    user: "${UID}:${GID}"
     environment:
       - SILAUTO_URL=http://silauto-api:8000
-      - SILNLP_ROOT=${HOME}/silnlp
-      - SILNLP_DATA=${HOME}/silnlp_data
+      - SILNLP_ROOT=${SILNLP_ROOT}
+      - SILNLP_DATA=${SILNLP_DATA}
       - USFM2PDF_PATH=${USFM2PDF_PATH}
       - USERNAME=${USER}
       - CUDA_DEVICE=0
@@ -37,17 +43,23 @@ services:
         max-file: "3"
 
   silauto-worker-2:
-    build: worker
+    build:
+      context: worker
+      args:
+      - UID=${UID}
+      - GID=${GID}
+      - USERNAME=${USER}
     restart: unless-stopped
+    user: "${UID}:${GID}"
     environment:
       - SILAUTO_URL=http://silauto-api:8000
-      - SILNLP_ROOT=${HOME}/silnlp
-      - SILNLP_DATA=${HOME}/silnlp_data
-      - USFM2PDF_PATH=${HOME}/Programming/usfm2pdf
+      - SILNLP_ROOT=${SILNLP_ROOT}
+      - SILNLP_DATA=${SILNLP_DATA}
+      - USFM2PDF_PATH=${USFM2PDF_PATH}
       - USERNAME=${USER}
       - CUDA_DEVICE=1
     volumes:
-      - ${HOME}/.ssh/container_key:/app/.ssh/id_ed25519:ro
+      - ${SSH_CONTAINER_KEY}:/app/.ssh/id_ed25519:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -74,7 +86,7 @@ services:
     restart: unless-stopped
     environment:
     - SILNLP_DATA=${SILNLP_DATA}
-    - MAX_CONCURRENT_FILE_PROCESSING=10
+    - MAX_CONCURRENT_FILE_PROCESSING=${MAX_CONCURRENT_FILE_PROCESSING:-10}
     - DATABASE_PATH=/app/db
     - CLIENT_PATH=/app/client
     volumes:
